@@ -1,4 +1,5 @@
 #include "main.h"
+
 /****************** PRINT POINTER ******************/
 /**
  * print_pointer - Prints the value of a pointer variable
@@ -11,45 +12,46 @@
  * Return: Number of chars printed.
  */
 int print_pointer(va_list types, char buffer[],
-		int flags, int width, int precision, int size)
+	int flags, int width, int precision, int size)
 {
 	char extra_c = 0, padd = ' ';
-	int index = BUFF_SIZE - 2, length = 2, padd_start = 1;
+	int ind = BUFF_SIZE - 2, length = 2, padd_start = 1; /* length=2, for '0x' */
 	unsigned long num_addrs;
 	char map_to[] = "0123456789abcdef";
 	void *addrs = va_arg(types, void *);
 
 	UNUSED(width);
 	UNUSED(size);
+
 	if (addrs == NULL)
-	{
 		return (write(1, "(nil)", 5));
-	}
+
 	buffer[BUFF_SIZE - 1] = '\0';
 	UNUSED(precision);
+
 	num_addrs = (unsigned long)addrs;
+
 	while (num_addrs > 0)
 	{
-		buffer[index--] = map_to[num_addrs % 16];
+		buffer[ind--] = map_to[num_addrs % 16];
 		num_addrs /= 16;
 		length++;
 	}
+
 	if ((flags & F_ZERO) && !(flags & F_MINUS))
-	{
 		padd = '0';
-	}
 	if (flags & F_PLUS)
-	{
 		extra_c = '+', length++;
-	}
 	else if (flags & F_SPACE)
-	{
 		extra_c = ' ', length++;
-	}
-	index++;
-	return (write_pointer(buffer, index, length,
-				width, flags, padd, extra_c, padd_start));
+
+	ind++;
+
+	/*return (write(1, &buffer[i], BUFF_SIZE - i - 1));*/
+	return (write_pointer(buffer, ind, length,
+		width, flags, padd, extra_c, padd_start));
 }
+
 /************************* PRINT NON PRINTABLE *************************/
 /**
  * print_non_printable - Prints ascii codes in hexa of non printable chars
@@ -64,33 +66,32 @@ int print_pointer(va_list types, char buffer[],
 int print_non_printable(va_list types, char buffer[],
 	int flags, int width, int precision, int size)
 {
-	int index = 0, offset = 0;
-	char *p = va_arg(types, char *);
+	int i = 0, offset = 0;
+	char *str = va_arg(types, char *);
 
 	UNUSED(flags);
 	UNUSED(width);
 	UNUSED(precision);
 	UNUSED(size);
 
-	if (p == NULL)
-	{
+	if (str == NULL)
 		return (write(1, "(null)", 6));
-	}
-	while (p[index] != '\0')
+
+	while (str[i] != '\0')
 	{
-		if (is_printable(p[index]))
-		{
-			buffer[index + offset] = p[index];
-		}
+		if (is_printable(str[i]))
+			buffer[i + offset] = str[i];
 		else
-		{
-			offset += append_hexa_code(p[index], buffer, index + offset);
-		}
-		index++;
+			offset += append_hexa_code(str[i], buffer, i + offset);
+
+		i++;
 	}
-	buffer[index + offset] = '\0';
-	return (write(1, buffer, index + offset));
+
+	buffer[i + offset] = '\0';
+
+	return (write(1, buffer, i + offset));
 }
+
 /************************* PRINT REVERSE *************************/
 /**
  * print_reverse - Prints reverse string.
@@ -106,27 +107,28 @@ int print_non_printable(va_list types, char buffer[],
 int print_reverse(va_list types, char buffer[],
 	int flags, int width, int precision, int size)
 {
-	char *p;
-	int index, count = 0;
+	char *str;
+	int i, count = 0;
 
 	UNUSED(buffer);
 	UNUSED(flags);
 	UNUSED(width);
 	UNUSED(size);
 
-	p = va_arg(types, char *);
+	str = va_arg(types, char *);
 
-	if (p == NULL)
+	if (str == NULL)
 	{
 		UNUSED(precision);
-		p = ")Null(";
+
+		str = ")Null(";
 	}
-	for (index = 0; p[index]; index++)
+	for (i = 0; str[i]; i++)
 		;
 
-	for (index = index - 1; index >= 0; index--)
+	for (i = i - 1; i >= 0; i--)
 	{
-		char z = p[index];
+		char z = str[i];
 
 		write(1, &z, 1);
 		count++;
@@ -148,38 +150,36 @@ int print_rot13string(va_list types, char buffer[],
 	int flags, int width, int precision, int size)
 {
 	char x;
-	char *p;
-	unsigned int index, index2;
+	char *str;
+	unsigned int i, j;
 	int count = 0;
 	char in[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 	char out[] = "NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm";
 
-	p = va_arg(types, char *);
+	str = va_arg(types, char *);
 	UNUSED(buffer);
 	UNUSED(flags);
 	UNUSED(width);
 	UNUSED(precision);
 	UNUSED(size);
 
-	if (p == NULL)
+	if (str == NULL)
+		str = "(AHYY)";
+	for (i = 0; str[i]; i++)
 	{
-		p = "(AHYY)";
-	}
-	for (index = 0; p[index]; index++)
-	{
-		for (index = 0; in[index2]; index2++)
+		for (j = 0; in[j]; j++)
 		{
-			if (in[index2] == p[index])
+			if (in[j] == str[i])
 			{
-				x = out[index2];
+				x = out[j];
 				write(1, &x, 1);
 				count++;
 				break;
 			}
 		}
-		if (!in[index2])
+		if (!in[j])
 		{
-			x = p[index];
+			x = str[i];
 			write(1, &x, 1);
 			count++;
 		}
