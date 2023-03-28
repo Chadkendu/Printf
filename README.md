@@ -21,13 +21,13 @@ The format string specifies the layout and content of the output, and the argume
 
 Some other important points to keep in mind about printf function:
 
-1.The function returns the number of characters printed.
+    1.The function returns the number of characters printed.
 
-2.The format string can include escape sequences to insert special characters, such as newlines or tabs.
+    2.The format string can include escape sequences to insert special characters, such as newlines     or tabs.
 
-3.The format specifiers can be modified with various flags to control the output format, such as specifying the width and precision of the output.
+    3.The format specifiers can be modified with various flags to control the output format, such as    specifying the width and precision of the output.
 
-4.The arguments must match the type specified by the corresponding conversion specifier.
+    4.The arguments must match the type specified by the corresponding conversion specifier.
 
 
 ## The recommended functions for this project
